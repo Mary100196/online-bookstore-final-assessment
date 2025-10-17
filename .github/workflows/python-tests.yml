@@ -2,24 +2,24 @@ name: Python CI - Online Bookstore
 
 on:
   push:
-    branches: [ main, testing-branch ]
+    branches: [ "main", "testing-branch" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1 - Checkout the repository
+      # Step 1 - Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # Step 2 - Set up Python environment
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.10'   # safer and faster for Actions runners
 
       # Step 3 - Install dependencies
       - name: Install dependencies
@@ -28,12 +28,12 @@ jobs:
           pip install -r requirements.txt || true
           pip install pytest pytest-cov flask
 
-      # Step 4 - Run all tests (point explicitly to the tests directory)
+      # Step 4 - Run all tests from the tests folder
       - name: Run tests with Pytest
         run: |
-          pytest tests/ -v --disable-warnings --maxfail=1 --cov=. || true
+          pytest tests/ -v --maxfail=5 --disable-warnings --cache-clear --cov=.
 
-      # Step 5 - Upload pytest results
+      # Step 5 - Upload test results (optional)
       - name: Upload pytest results
         if: always()
         uses: actions/upload-artifact@v4
